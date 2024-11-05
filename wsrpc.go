@@ -2,6 +2,7 @@ package wsrpc
 
 import (
 	"errors"
+	"io"
 	"net"
 	"net/rpc"
 	"sync"
@@ -20,7 +21,10 @@ type WSRPC struct {
 
 // NewServer creates a new server on a net.Conn connection.
 func NewServer(conn net.Conn) (*WSRPC, error) {
-	session, err := yamux.Server(conn, nil)
+	yamuxConfig := yamux.DefaultConfig()
+	yamuxConfig.LogOutput = io.Discard
+
+	session, err := yamux.Server(conn, yamuxConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +52,10 @@ func NewServer(conn net.Conn) (*WSRPC, error) {
 
 // NewClient creates a new client on a net.Conn connection.
 func NewClient(conn net.Conn) (*WSRPC, error) {
-	session, err := yamux.Client(conn, nil)
+	yamuxConfig := yamux.DefaultConfig()
+	yamuxConfig.LogOutput = io.Discard
+
+	session, err := yamux.Client(conn, yamuxConfig)
 	if err != nil {
 		return nil, err
 	}
