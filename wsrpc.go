@@ -97,7 +97,7 @@ func (wsrpc *WSRPC) acceptStreams() {
 			return
 		}
 
-		go wsrpc.rpcServer.ServeConn(stream)
+		wsrpc.rpcServer.ServeConn(stream)
 	}
 }
 
@@ -108,13 +108,9 @@ func (wsrpc *WSRPC) Register(rcvr interface{}) error {
 
 // Call calls the named function, waits for it to complete, and returns its error status.
 func (wsrpc *WSRPC) Call(serviceMethod string, args interface{}, reply interface{}) error {
-	wsrpc.mu.Lock()
-	defer wsrpc.mu.Unlock()
-
 	if wsrpc.rpcClient == nil {
 		return errors.New("rpc client is not initialized")
 	}
-
 	return wsrpc.rpcClient.Call(serviceMethod, args, reply)
 }
 
